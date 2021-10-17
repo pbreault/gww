@@ -9,7 +9,7 @@ import java.nio.file.FileSystems
 class App(private val args: Array<String>, private val fileSystem: FileSystem) {
     fun run(): String {
         val executableLocation = fileSystem.gradlePath()
-        val arguments = args.parseArguments()
+        val arguments = args.parseArguments(fileSystem)
 
         return "$executableLocation $arguments"
     }

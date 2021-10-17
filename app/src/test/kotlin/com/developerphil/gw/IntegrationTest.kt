@@ -5,50 +5,21 @@ package com.developerphil.gw
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.google.common.jimfs.Configuration
-import com.google.common.jimfs.Jimfs
+import com.developerphil.gw.TestData.unixFileSystem
 import org.junit.Test
-import java.nio.file.Files
 
 class IntegrationTest {
 
-    /**
-     * Structure:
-     * /
-     * ├── project
-     * │   ├── gradlew
-     * │   ├── project_a
-     * │   │   ├── feature
-     * │   │   │   └── login
-     * │   │   └── gradlew
-     * │   └── project_b
-     * └── tmp
-     *     └── logs
-     */
-    private fun fileSystem(workingDirectory: String) = Jimfs.newFileSystem(
-        Configuration.unix().toBuilder()
-            .setWorkingDirectory(workingDirectory)
-            .build()
-    )
-        .apply {
-            Files.createDirectories(getPath("/project/project_a/feature/login"))
-            Files.createFile(getPath("/project/gradlew"))
-            Files.createFile(getPath("/project/project_a/gradlew"))
-
-            Files.createDirectories(getPath("/project/project_b"))
-            Files.createDirectories(getPath("/tmp/logs"))
-        }
-
     @Test
     fun `can run a simple command`() {
-        val app = App(arrayOf("clean assemble"), fileSystem(workingDirectory = "/project"))
+        val app = App(arrayOf("clean assemble"), unixFileSystem(workingDirectory = "/project"))
 
         assertThat(app.run()).isEqualTo("./gradlew clean assemble")
     }
 
     @org.junit.Test
     fun `can run a simple command from a different folder`() {
-        val app = App(arrayOf("clean assemble"), fileSystem(workingDirectory = "/project/project_a/feature/login"))
+        val app = App(arrayOf("clean assemble"), unixFileSystem(workingDirectory = "/project/project_a/feature/login"))
 
         assertThat(app.run()).isEqualTo("../../gradlew clean assemble")
     }

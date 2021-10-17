@@ -9,70 +9,36 @@ import assertk.assertions.hasClass
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFailure
-import assertk.thrownError
-import com.google.common.jimfs.Configuration
-import com.google.common.jimfs.Jimfs
-import org.junit.Before
-import java.nio.file.Files
-import java.nio.file.Path
-import kotlin.io.path.listDirectoryEntries
+import com.developerphil.gw.TestData.unixFileSystem
 import kotlin.test.Test
 
 class GradleFinderTest {
 
-    /**
-     * Structure:
-     * /
-     * ├── project
-     * │   ├── gradlew
-     * │   ├── project_a
-     * │   │   ├── feature
-     * │   │   │   └── login
-     * │   │   └── gradlew
-     * │   └── project_b
-     * └── tmp
-     *     └── logs
-     */
-    private fun fileSystem(workingDirectory: String) = Jimfs.newFileSystem(
-        Configuration.unix().toBuilder()
-            .setWorkingDirectory(workingDirectory)
-            .build()
-    )
-        .apply {
-            Files.createDirectories(getPath("/project/project_a/feature/login"))
-            Files.createFile(getPath("/project/gradlew"))
-            Files.createFile(getPath("/project/project_a/gradlew"))
-
-            Files.createDirectories(getPath("/project/project_b"))
-            Files.createDirectories(getPath("/tmp/logs"))
-        }
-
-
     @Test
     fun canFindGradleWrapperInSameFolder() {
-        with(fileSystem("/project/")) {
+        with(unixFileSystem("/project/")) {
             assertThat(gradlePath()).isEqualTo(getPath("./gradlew"))
         }
 
-        with(fileSystem("/project/project_a")) {
+        with(unixFileSystem("/project/project_a")) {
             assertThat(gradlePath()).isEqualTo(getPath("./gradlew"))
         }
     }
 
     @Test
     fun canFindGradleWrapperInParentFolder() {
-        with(fileSystem("/project/project_a/feature/")) {
+        with(unixFileSystem("/project/project_a/feature/")) {
             assertThat(gradlePath()).isEqualTo(getPath("../gradlew"))
         }
 
-        with(fileSystem("/project/project_a/feature/login")) {
+        with(unixFileSystem("/project/project_a/feature/login")) {
             assertThat(gradlePath()).isEqualTo(getPath("../../gradlew"))
         }
     }
 
     @Test
     fun throwExceptionIfGradlewIsNotFound() {
-        with(fileSystem("/")) {
+        with(unixFileSystem("/")) {
             assertThat { gradlePath() }
                 .isFailure()
                 .all {
@@ -81,7 +47,7 @@ class GradleFinderTest {
                 }
         }
 
-        with(fileSystem("/tmp/logs")) {
+        with(unixFileSystem("/tmp/logs")) {
             assertThat { gradlePath() }
                 .isFailure()
                 .all {
@@ -94,7 +60,7 @@ class GradleFinderTest {
 
     @org.junit.Test
     fun `Files should have an executable path`() {
-        val fileSystem = fileSystem("/project")
+        val fileSystem = unixFileSystem("/project")
 
         assertThat(fileSystem.getPath("gradlew").toUnixExecutable().toString()).isEqualTo("./gradlew")
         assertThat(fileSystem.getPath("../gradlew").toUnixExecutable().toString()).isEqualTo("../gradlew")

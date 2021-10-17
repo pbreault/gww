@@ -5,16 +5,34 @@ package com.developerphil.gw
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import com.developerphil.gw.TestData.unixFileSystem
 import kotlin.test.Test
 
 class ArgsConverterTest {
 
+
     @Test
-    fun `Can represent the argument array as a space delimited string`() {
-        assertThat(arrayOf("tasks").parseArguments()).isEqualTo("tasks")
-        assertThat(arrayOf("clean assemble").parseArguments()).isEqualTo("clean assemble")
-        assertThat(arrayOf("").parseArguments()).isEqualTo("")
+    fun `Standard arguments are passed as is`() {
+        "" parsesTo ""
+        "tasks" parsesTo "tasks"
+        "clean assemble" parsesTo "clean assemble"
+        "app:assembleDebug" parsesTo ":app:assembleDebug"
+        ":app:assembleDebug" parsesTo ":app:assembleDebug"
+        ":app:clean :app:assembleDebug" parsesTo ":app:clean :app:assembleDebug"
+        ":app:clean :app:assembleDebug --verbose -Dorg.debug.gradle=true" parsesTo ":app:clean :app:assembleDebug --verbose -Dorg.debug.gradle=true"
     }
 
+    @org.junit.Test
+    fun `Can convert paths to project coordinates`() {
+        "feature/login:assembleDebug" parsesTo ":feature:login:assembleDebug"
+        "feature/login/test-support:assembleDebug" parsesTo ":feature:login:test-support:assembleDebug"
+        "feature/login/test-support:assembleDebug -Dorg.gradle.debug=true" parsesTo ":feature:login:test-support:assembleDebug -Dorg.gradle.debug=true"
+    }
+
+
+    private infix fun String.parsesTo(expected: String) {
+        val argsArray = this.split(" ").toTypedArray()
+        assertThat(argsArray.parseArguments(unixFileSystem())).isEqualTo(expected)
+    }
 }
 
