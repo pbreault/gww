@@ -10,7 +10,7 @@ fun main(args: Array<String>) {
     val executableLocation = FileSystems.getDefault().gradlePath()
     val arguments = args.parseArguments()
 
-    runCommand("$executableLocation $arguments")
+    runCommand("./$executableLocation $arguments")
 }
 
 fun runCommand(command: String) {
