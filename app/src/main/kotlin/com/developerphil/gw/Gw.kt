@@ -3,22 +3,16 @@
  */
 package com.developerphil.gw
 
-import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 
 
 fun main(args: Array<String>) {
     val executableLocation = FileSystems.getDefault().gradlePath()
-    val arguments = "tasks"
-    runCommand("$executableLocation $arguments")
+    val arguments = args.parseArguments()
 
+    runCommand("$executableLocation $arguments")
 }
 
 fun runCommand(command: String) {
     println(command)
 }
-
-fun getWorkingDirectory(fileSystem: FileSystem = FileSystems.getDefault()): String {
-    return fileSystem.getPath("").toAbsolutePath().toString()
-}
-
