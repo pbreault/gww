@@ -3,16 +3,24 @@
  */
 package com.developerphil.gw
 
+import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 
+class App(private val args: Array<String>, private val fileSystem: FileSystem) {
+    fun run(): String {
+        val executableLocation = fileSystem.gradlePath()
+        val arguments = args.parseArguments()
+
+        return "$executableLocation $arguments"
+    }
+}
 
 fun main(args: Array<String>) {
-    val executableLocation = FileSystems.getDefault().gradlePath()
-    val arguments = args.parseArguments()
-
-    runCommand("./$executableLocation $arguments")
+    println(
+        App(
+            args,
+            FileSystems.getDefault()
+        ).run()
+    )
 }
 
-fun runCommand(command: String) {
-    println(command)
-}

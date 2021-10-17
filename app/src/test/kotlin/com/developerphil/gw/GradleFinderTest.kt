@@ -14,6 +14,7 @@ import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
 import org.junit.Before
 import java.nio.file.Files
+import java.nio.file.Path
 import kotlin.io.path.listDirectoryEntries
 import kotlin.test.Test
 
@@ -50,11 +51,11 @@ class GradleFinderTest {
     @Test
     fun canFindGradleWrapperInSameFolder() {
         with(fileSystem("/project/")) {
-            assertThat(gradlePath()).isEqualTo(getPath("gradlew"))
+            assertThat(gradlePath()).isEqualTo(getPath("./gradlew"))
         }
 
         with(fileSystem("/project/project_a")) {
-            assertThat(gradlePath()).isEqualTo(getPath("gradlew"))
+            assertThat(gradlePath()).isEqualTo(getPath("./gradlew"))
         }
     }
 
@@ -88,6 +89,16 @@ class GradleFinderTest {
                     hasClass(GradleNotFoundException::class.java)
                 }
         }
+    }
+
+
+    @org.junit.Test
+    fun `Files should have an executable path`() {
+        val fileSystem = fileSystem("/project")
+
+        assertThat(fileSystem.getPath("gradlew").toUnixExecutable().toString()).isEqualTo("./gradlew")
+        assertThat(fileSystem.getPath("../gradlew").toUnixExecutable().toString()).isEqualTo("../gradlew")
+        assertThat(fileSystem.getPath("project_a/gradlew").toUnixExecutable().toString()).isEqualTo("project_a/gradlew")
     }
 }
 
