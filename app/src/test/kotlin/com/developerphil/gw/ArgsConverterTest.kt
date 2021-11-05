@@ -29,6 +29,11 @@ class ArgsConverterTest {
         "feature/login/test-support:assembleDebug -Dorg.gradle.debug=true" parsesTo ":feature:login:test-support:assembleDebug -Dorg.gradle.debug=true"
     }
 
+    @org.junit.Test
+    fun `Don't perform replacements if paths are between double-quotes`() {
+        "\"hello/\"" parsesTo "\"hello/\""
+        "\"hello/world\"" parsesTo "\"hello/world\""
+    }
 
     private infix fun String.parsesTo(expected: String) {
         val argsArray = this.split(" ").toTypedArray()

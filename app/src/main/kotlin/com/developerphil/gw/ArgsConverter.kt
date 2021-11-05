@@ -11,6 +11,10 @@ fun Array<String>.parseArguments(fileSystem: FileSystem): String {
 }
 
 private fun convertPathsToGradleCoordinates(arg: String, separator: String): String {
+    if (arg.startsWith("\"") && arg.endsWith("\"")) {
+        return arg
+    }
+
     return with(arg.replace(separator, ":")) {
         if (contains(":") && !startsWith(":"))
             ":$this"

@@ -12,16 +12,26 @@ class IntegrationTest {
 
     @Test
     fun `can run a simple command`() {
-        val app = App(arrayOf("clean assemble"), unixFileSystem(workingDirectory = "/project"))
+        val app = App(arrayOf("clean", "assemble"), unixFileSystem(workingDirectory = "/project"))
 
         assertThat(app.run()).isEqualTo("./gradlew clean assemble")
     }
 
-    @org.junit.Test
+    @Test
     fun `can run a simple command from a different folder`() {
-        val app = App(arrayOf("clean assemble"), unixFileSystem(workingDirectory = "/project/project_a/feature/login"))
+        val app =
+            App(arrayOf("clean", "assemble"), unixFileSystem(workingDirectory = "/project/project_a/feature/login"))
 
         assertThat(app.run()).isEqualTo("../../gradlew clean assemble")
+    }
+
+
+    @Test
+    fun `keep file paths as is for include-build`() {
+        val app =
+            App(arrayOf("clean", "assemble", "--include-build", "\"/project/projectb\""), unixFileSystem(workingDirectory = "/project/project_a/feature/login"))
+
+        assertThat(app.run()).isEqualTo("../../gradlew clean assemble --include-build \"/project/projectb\"")
     }
 }
 
