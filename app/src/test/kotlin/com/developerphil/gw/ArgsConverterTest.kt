@@ -22,19 +22,25 @@ class ArgsConverterTest {
         ":app:clean :app:assembleDebug --verbose -Dorg.debug.gradle=true" parsesTo ":app:clean :app:assembleDebug --verbose -Dorg.debug.gradle=true"
     }
 
-    @org.junit.Test
+    @Test
     fun `Can convert paths to project coordinates`() {
         "feature/login:assembleDebug" parsesTo ":feature:login:assembleDebug"
         "feature/login/test-support:assembleDebug" parsesTo ":feature:login:test-support:assembleDebug"
         "feature/login/test-support:assembleDebug -Dorg.gradle.debug=true" parsesTo ":feature:login:test-support:assembleDebug -Dorg.gradle.debug=true"
     }
 
-    @org.junit.Test
+    @Test
     fun `Don't perform replacements if paths are between double-quotes`() {
         "\"hello/\"" parsesTo "\"hello/\""
         "\"hello/world\"" parsesTo "\"hello/world\""
     }
 
+
+    @Test
+    fun `Join paths and task names when multiple tasks are provided for the same path`() {
+        "feature/login:clean//assembleDebug" parsesTo ":feature:login:clean :feature:login:assembleDebug"
+        "feature/login:clean//assembleDebug//test" parsesTo ":feature:login:clean :feature:login:assembleDebug :feature:login:test"
+    }
     private infix fun String.parsesTo(expected: String) {
         val argsArray = this.split(" ").toTypedArray()
         assertThat(argsArray.parseArguments(unixFileSystem())).isEqualTo(expected)

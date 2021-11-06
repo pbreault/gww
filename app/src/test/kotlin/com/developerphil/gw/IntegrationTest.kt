@@ -27,9 +27,30 @@ class IntegrationTest {
 
 
     @Test
+    fun `can run a commands with replacements from the root folder`() {
+        val app = App(
+            arrayOf("feature/login:clean", "feature/login:assemble"),
+            unixFileSystem(workingDirectory = "/project/project_a")
+        )
+
+        assertThat(app.run()).isEqualTo("./gradlew :feature:login:clean :feature:login:assemble")
+    }
+
+    @Test
+    fun `can combine commands on a single project`() {
+        val app = App(arrayOf("feature/login:clean//assemble"), unixFileSystem(workingDirectory = "/project/project_a"))
+
+        assertThat(app.run()).isEqualTo("./gradlew :feature:login:clean :feature:login:assemble")
+    }
+
+
+    @Test
     fun `keep file paths as is for include-build`() {
         val app =
-            App(arrayOf("clean", "assemble", "--include-build", "\"/project/projectb\""), unixFileSystem(workingDirectory = "/project/project_a/feature/login"))
+            App(
+                arrayOf("clean", "assemble", "--include-build", "\"/project/projectb\""),
+                unixFileSystem(workingDirectory = "/project/project_a/feature/login")
+            )
 
         assertThat(app.run()).isEqualTo("../../gradlew clean assemble --include-build \"/project/projectb\"")
     }

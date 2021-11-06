@@ -15,6 +15,16 @@ private fun convertPathsToGradleCoordinates(arg: String, separator: String): Str
         return arg
     }
 
+    val taskSeparator = "$separator$separator"
+    if (arg.contains(taskSeparator)) {
+        var project = arg.substringBeforeLast(":")
+        var tasks = arg.substringAfterLast(":")
+
+        return tasks.split(taskSeparator)
+            .map { task -> convertPathsToGradleCoordinates("$project:$task", separator) }
+            .joinToString(" ")
+    }
+
     return with(arg.replace(separator, ":")) {
         if (contains(":") && !startsWith(":"))
             ":$this"
