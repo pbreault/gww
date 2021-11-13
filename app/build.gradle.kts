@@ -36,13 +36,8 @@ application {
 }
 
 tasks.withType<CreateStartScripts>() {
-
     inputs.files("unix_script_template.txt")
 
     val scriptGenerator = unixStartScriptGenerator as TemplateBasedScriptGenerator
     scriptGenerator.template = resources.text.fromFile("unix_script_template.txt")
-
-    doLast {
-        println("configured the start scripts")
-    }
 }
