@@ -5,9 +5,7 @@ import java.nio.file.FileSystem
 fun Array<String>.parseArguments(fileSystem: FileSystem): String {
     val separator = fileSystem.separator
 
-    return this
-        .map { convertPathsToGradleCoordinates(it, separator) }
-        .joinToString(" ")
+    return this.joinToString(separator = " ") { convertPathsToGradleCoordinates(it, separator) }
 }
 
 private fun convertPathsToGradleCoordinates(arg: String, separator: String): String {
@@ -17,12 +15,17 @@ private fun convertPathsToGradleCoordinates(arg: String, separator: String): Str
 
     val taskSeparator = "$separator$separator"
     if (arg.contains(taskSeparator)) {
-        var project = arg.substringBeforeLast(":")
-        var tasks = arg.substringAfterLast(":")
+
+        val project = if (arg.contains(":")) {
+            arg.substringBeforeLast(":") + ":"
+        } else {
+            ""
+        }
+
+        val tasks = arg.substringAfterLast(":")
 
         return tasks.split(taskSeparator)
-            .map { task -> convertPathsToGradleCoordinates("$project:$task", separator) }
-            .joinToString(" ")
+            .joinToString(separator = " ") { task -> convertPathsToGradleCoordinates("$project$task", separator) }
     }
 
     return with(arg.replace(separator, ":")) {

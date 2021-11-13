@@ -40,6 +40,7 @@ class ArgsConverterTest {
     fun `Join paths and task names when multiple tasks are provided for the same path`() {
         "feature/login:clean//assembleDebug" parsesTo ":feature:login:clean :feature:login:assembleDebug"
         "feature/login:clean//assembleDebug//test" parsesTo ":feature:login:clean :feature:login:assembleDebug :feature:login:test"
+        "assembleDebug//test" parsesTo "assembleDebug test"
     }
     private infix fun String.parsesTo(expected: String) {
         val argsArray = this.split(" ").toTypedArray()
