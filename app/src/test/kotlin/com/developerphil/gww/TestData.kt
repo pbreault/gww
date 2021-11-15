@@ -1,4 +1,4 @@
-package com.developerphil.gw
+package com.developerphil.gww
 
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs

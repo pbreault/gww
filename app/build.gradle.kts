@@ -32,7 +32,8 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("com.developerphil.gw.GwKt")
+    mainClass.set("com.developerphil.gww.MainKt")
+    applicationName = "gww"
 }
 
 tasks.withType<CreateStartScripts>() {

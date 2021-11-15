@@ -1,4 +1,4 @@
-package com.developerphil.gw
+package com.developerphil.gww
 
 import java.nio.file.FileSystem
 import java.nio.file.Path
