@@ -268,4 +268,12 @@ eval "set -- \$(
         sed ' s~[^-[:alnum:]+,./:=@_]~\\\\&~g; ' |
         tr '\\n' ' '
     )" '"\$@"'
-exec `"\$JAVACMD" "\$@"`
+
+COMMAND=`"\$JAVACMD" "\$@"`
+if [ \$? == 0 ];
+then
+    # Only delegate to gradle if the command was built successfully
+    exec \$COMMAND
+else
+    exit 1
+fi
