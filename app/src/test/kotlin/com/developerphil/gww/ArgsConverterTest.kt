@@ -35,13 +35,24 @@ class ArgsConverterTest {
         "\"hello/world\"" parsesTo "\"hello/world\""
     }
 
-
     @Test
     fun `Join paths and task names when multiple tasks are provided for the same path`() {
         "feature/login:clean//assembleDebug" parsesTo ":feature:login:clean :feature:login:assembleDebug"
         "feature/login:clean//assembleDebug//test" parsesTo ":feature:login:clean :feature:login:assembleDebug :feature:login:test"
         "assembleDebug//test" parsesTo "assembleDebug test"
     }
+
+    @Test
+    fun `Parameters with slashes aren't parsed as project coordinates`() {
+        "-PgitBranch=origin/develop" parsesTo "-PgitBranch=origin/develop"
+        "clean assemble -PgitBranch=origin/develop" parsesTo "clean assemble -PgitBranch=origin/develop"
+        "app:assembleDebug -PgitBranch=origin/develop" parsesTo ":app:assembleDebug -PgitBranch=origin/develop"
+        ":app:assembleDebug -PgitBranch=origin/develop" parsesTo ":app:assembleDebug -PgitBranch=origin/develop"
+        "feature/login:assembleDebug -PgitBranch=origin/develop" parsesTo ":feature:login:assembleDebug -PgitBranch=origin/develop"
+        "feature/login/test-support:assembleDebug -PgitBranch=origin/develop" parsesTo ":feature:login:test-support:assembleDebug -PgitBranch=origin/develop"
+        "feature/login/test-support:assembleDebug -Dorg.gradle.debug=true -PgitBranch=origin/develop" parsesTo ":feature:login:test-support:assembleDebug -Dorg.gradle.debug=true -PgitBranch=origin/develop"
+    }
+
     private infix fun String.parsesTo(expected: String) {
         val argsArray = this.split(" ").toTypedArray()
         assertThat(argsArray.parseArguments(unixFileSystem())).isEqualTo(expected)

@@ -13,6 +13,10 @@ private fun convertPathsToGradleCoordinates(arg: String, separator: String): Str
         return arg
     }
 
+    if (arg.startsWith("-P") || arg.startsWith("-D")) {
+        return arg
+    }
+
     val taskSeparator = "$separator$separator"
     if (arg.contains(taskSeparator)) {
 
